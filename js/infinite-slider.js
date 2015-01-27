@@ -23,6 +23,7 @@
 			responsive    : false,
 			speed         : "normal",
 			swipe         : false,
+			swipeLimit    : false,
 			width         : "100%"
 		}, options);
 		
@@ -60,11 +61,31 @@
 					
 					// Slider animate fn
 					
-					is.engineAnimate = function (point, curElem) {
+					is.engineAnimate = function (point, curElem, swipeFirst, swipeLast) {
 					
 						if (settings.navigation) {
 							$(".slider-nav-items.active", is.wrapper).removeClass("active");
 							$(".slider-nav-items", is.wrapper).eq(curElem - 1).addClass("active");							
+						}
+						
+						if (swipeFirst) {
+							
+							is.engine.stop(false, true).animate({ marginLeft: '-' + point + 'px' }, settings.speed, function(){
+								is.engine.css( "margin-left", "-" + is.wrapper.width() + "px" );
+							});
+							
+							return;
+							
+						}
+						
+						if (swipeLast) {
+							
+							is.engine.stop(false, true).animate({ marginLeft: '-' + point + 'px' }, settings.speed, function(){
+								is.engine.css( "margin-left", "-" + (is.wrapper.width() * (is.count - 2)) + "px" );
+							});
+							
+							return;
+							
 						}
 						
 						if (point == "first") {
@@ -170,11 +191,53 @@
 					
 					if (settings.swipe) {
 						is.engine.swipe({
-							swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
-								(direction == "left") ? is.next.click() : (direction == "right") ? is.prev.click() : null;
-							},
-							threshold:0,
-							fingers:'all'
+							threshold   : 0,
+							swipeStatus : function(event, phase, direction, distance, duration, fingerCount){
+								
+								if (direction == 'left') {
+									
+									var distancePoint = (is.wrapper.width() * is.current);
+									
+									is.engine.stop().css('margin-left', '-' + (distancePoint + distance) + 'px');
+									
+									if (distance > settings.swipeLimit && phase == 'end') {
+										
+										(is.current < is.count - 2) ?
+											is.engineAnimate('-' + ((is.wrapper.width() * is.current) + is.wrapper.width()), ++is.current) :
+											is.engineAnimate( ((is.wrapper.width() * is.current) + is.wrapper.width()), is.current = 1, true );
+										
+									} else if (distance < settings.swipeLimit && phase == 'end') {
+										
+										is.engineAnimate( '-' + (is.wrapper.width() * is.current), is.current );
+										
+									}
+									
+								}
+								
+								if (direction == 'right') {
+									
+									var distancePoint = (is.wrapper.width() * (is.current - 1));
+									
+									(is.current > 1) ?
+										is.engine.stop().css('margin-left', '-' + ((distancePoint + is.wrapper.width()) - distance) + 'px') :
+										is.engine.stop().css('margin-left', '-' + ((distancePoint - distance) + is.wrapper.width()) + 'px');
+									
+									if (distance > settings.swipeLimit && phase == 'end') {
+										
+										(is.current > 1) ?
+											is.engineAnimate( '+=' + (is.wrapper.width() - distance), --is.current ) :
+											is.engineAnimate( 0, is.current = is.count - 2, false, true );
+										
+									} else if (distance < settings.swipeLimit && phase == 'end') {
+										
+										is.engineAnimate('-' + (is.wrapper.width() * is.current), is.current);
+										
+									}
+									
+								}
+								
+							}
+							
 						});
 					}
 			
