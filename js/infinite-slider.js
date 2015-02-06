@@ -11,6 +11,7 @@
 	$.fn.infiniteSlider = function(options) {
 	
 		var settings = $.extend({
+			animateType   : false,
 			autoPlaySpeed : false,
 			btnsText      : {
 				next      : "",
@@ -70,8 +71,11 @@
 						
 						if (swipeFirst) {
 							
-							is.engine.stop(false, true).animate({ marginLeft: '-' + point + 'px' }, settings.speed, function(){
+							is.engine.stop(false, true).animate({ marginLeft: '-' + point + 'px' }, settings.speed, settings.animateType, function(){
 								is.engine.css( "margin-left", "-" + is.wrapper.width() + "px" );
+								if ( is.engine.hasClass('moving') ) {
+									is.engine.removeClass('moving');
+								}
 							});
 							
 							return;
@@ -80,8 +84,11 @@
 						
 						if (swipeLast) {
 							
-							is.engine.stop(false, true).animate({ marginLeft: '-' + point + 'px' }, settings.speed, function(){
+							is.engine.stop(false, true).animate({ marginLeft: '-' + point + 'px' }, settings.speed, settings.animateType, function(){
 								is.engine.css( "margin-left", "-" + (is.wrapper.width() * (is.count - 2)) + "px" );
+								if ( is.engine.hasClass('moving') ) {
+									is.engine.removeClass('moving');
+								}
 							});
 							
 							return;
@@ -89,15 +96,19 @@
 						}
 						
 						if (point == "first") {
-							is.engine.stop(false, true).animate({ marginLeft: "-=" + is.wrapper.width() + "px" }, settings.speed, function (){
+							is.engine.stop(false, true).animate({ marginLeft: "-=" + is.wrapper.width() + "px" }, settings.speed, settings.animateType, function (){
 								is.engine.css( "margin-left", "-" + is.wrapper.width() + "px" );
 							});
 						} else if (point == "last") {
-							is.engine.stop(false, true).animate({ marginLeft: "0px" }, settings.speed, function (){
+							is.engine.stop(false, true).animate({ marginLeft: "0px" }, settings.speed, settings.animateType, function (){
 								is.engine.css( "margin-left", "-" + (is.wrapper.width() * (is.count - 2)) + "px" );
 							});
 						} else {
-							is.engine.stop(false, true).animate({ marginLeft: point + "px" }, settings.speed);
+							is.engine.stop(false, true).animate({ marginLeft: point + "px" }, settings.speed, settings.animateType, function(){
+								if ( is.engine.hasClass('moving') ) {
+									is.engine.removeClass('moving');
+								}
+							});
 						}
 						
 					}
@@ -166,14 +177,29 @@
 					if (settings.responsive) {
 					
 						$(window).resize(function(){
-							var selfWidth = $(this).width() + "px";
-							is.wrapper.width( selfWidth );
-							is.engine.stop(false, true).css({
-								marginLeft : "-" + (selfWidth * is.current),
-								width      : selfWidth * is.count
-							});
-							$(".slider-box", is.wrapper).width( selfWidth );
+							
+							var selfWidth = parseInt($(this).width());
+							
+							if ( selfWidth < 870 ) {
+								
+								is.wrapper.width( selfWidth );
+								$(".slider-box", is.wrapper).width( selfWidth );
+								
+								is.engine.width(selfWidth * is.count);
+								is.engineAnimate( "-" + (selfWidth * is.current), is.current );
+								
+							} else {
+								
+								is.wrapper.width( 870 );
+								$(".slider-box", is.wrapper).width( 870 );
+								
+								is.engine.width(870 * is.count);
+								is.engineAnimate( "-" + (870 * is.current), is.current );
+								
+							}
+							
 						});
+						
 						
 					}
 					
@@ -190,11 +216,30 @@
 					// Swipe
 					
 					if (settings.swipe) {
+						
+						is.linkPreventClick = function( elem ) {
+							
+							elem.click(function(){
+										
+								if ( is.engine.hasClass('moving') ) {
+									return false;
+								}
+								
+							});
+							
+						};
+						
 						is.engine.swipe({
-							threshold   : 0,
-							swipeStatus : function(event, phase, direction, distance, duration, fingerCount){
+							threshold        : 0,
+							excludedElements : 'button, input, select, textarea, .noSwipe',
+							allowPageScroll  : 'vertical',
+							swipeStatus      : function(event, phase, direction, distance, duration, fingerCount){
 								
 								if (direction == 'left') {
+								
+									is.engine.addClass('moving');
+								
+									is.linkPreventClick( $('.slider-box', is.wrapper) );
 									
 									var distancePoint = (is.wrapper.width() * is.current);
 									
@@ -206,7 +251,7 @@
 											is.engineAnimate('-' + ((is.wrapper.width() * is.current) + is.wrapper.width()), ++is.current) :
 											is.engineAnimate( ((is.wrapper.width() * is.current) + is.wrapper.width()), is.current = 1, true );
 										
-									} else if (distance < settings.swipeLimit && phase == 'end') {
+									} else if (distance <= settings.swipeLimit && phase == 'end') {
 										
 										is.engineAnimate( '-' + (is.wrapper.width() * is.current), is.current );
 										
@@ -215,6 +260,10 @@
 								}
 								
 								if (direction == 'right') {
+								
+									is.engine.addClass('moving');
+								
+									is.linkPreventClick( $('.slider-box', is.wrapper) );
 									
 									var distancePoint = (is.wrapper.width() * (is.current - 1));
 									
@@ -228,7 +277,7 @@
 											is.engineAnimate( '+=' + (is.wrapper.width() - distance), --is.current ) :
 											is.engineAnimate( 0, is.current = is.count - 2, false, true );
 										
-									} else if (distance < settings.swipeLimit && phase == 'end') {
+									} else if (distance <= settings.swipeLimit && phase == 'end') {
 										
 										is.engineAnimate('-' + (is.wrapper.width() * is.current), is.current);
 										
