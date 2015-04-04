@@ -179,24 +179,12 @@
 						$(window).resize(function(){
 							
 							var selfWidth = parseInt($(this).width());
+								
+							is.wrapper.width( selfWidth );
+							$(".slider-box", is.wrapper).width( selfWidth );
 							
-							if ( selfWidth < 870 ) {
-								
-								is.wrapper.width( selfWidth );
-								$(".slider-box", is.wrapper).width( selfWidth );
-								
-								is.engine.width(selfWidth * is.count);
-								is.engineAnimate( "-" + (selfWidth * is.current), is.current );
-								
-							} else {
-								
-								is.wrapper.width( 870 );
-								$(".slider-box", is.wrapper).width( 870 );
-								
-								is.engine.width(870 * is.count);
-								is.engineAnimate( "-" + (870 * is.current), is.current );
-								
-							}
+							is.engine.width(selfWidth * is.count);
+							is.engineAnimate( "-" + (selfWidth * is.current), is.current );
 							
 						});
 						
