@@ -233,7 +233,7 @@
 									
 									is.engine.stop().css('margin-left', '-' + (distancePoint + distance) + 'px');
 									
-									if (distance > settings.swipeLimit && phase == 'end') {
+									if (distance >= settings.swipeLimit && phase == 'end') {
 										
 										(is.current < is.count - 2) ?
 											is.engineAnimate('-' + ((is.wrapper.width() * is.current) + is.wrapper.width()), ++is.current) :
@@ -259,7 +259,7 @@
 										is.engine.stop().css('margin-left', '-' + ((distancePoint + is.wrapper.width()) - distance) + 'px') :
 										is.engine.stop().css('margin-left', '-' + ((distancePoint - distance) + is.wrapper.width()) + 'px');
 									
-									if (distance > settings.swipeLimit && phase == 'end') {
+									if (distance >= settings.swipeLimit && phase == 'end') {
 										
 										(is.current > 1) ?
 											is.engineAnimate( '+=' + (is.wrapper.width() - distance), --is.current ) :
