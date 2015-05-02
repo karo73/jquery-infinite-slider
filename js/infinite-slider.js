@@ -223,7 +223,7 @@
 							allowPageScroll  : 'vertical',
 							swipeStatus      : function(event, phase, direction, distance, duration, fingerCount){
 								
-								if (direction == 'left' && distance) {
+								if ((direction == 'left' || direction == 'up') && distance) {
 								
 									is.engine.addClass('moving');
 								
@@ -237,17 +237,23 @@
 										
 										(is.current < is.count - 2) ?
 											is.engineAnimate('-' + ((is.wrapper.width() * is.current) + is.wrapper.width()), ++is.current) :
-											is.engineAnimate( ((is.wrapper.width() * is.current) + is.wrapper.width()), is.current = 1, true );
+												is.engineAnimate( ((is.wrapper.width() * is.current) + is.wrapper.width()), is.current = 1, true );
 										
 									} else if (distance <= settings.swipeLimit && phase == 'end') {
 										
 										is.engineAnimate( '-' + (is.wrapper.width() * is.current), is.current );
 										
+									} else if (phase == 'cancel') {
+										
+										(is.current < is.count - 2) ?
+											is.engineAnimate('-' + ((is.wrapper.width() * is.current) + is.wrapper.width()), ++is.current) :
+												is.engineAnimate( ((is.wrapper.width() * is.current) + is.wrapper.width()), is.current = 1, true );
+										
 									}
 									
 								}
 								
-								if (direction == 'right' && distance) {
+								if ((direction == 'right' || direction == 'down') && distance) {
 								
 									is.engine.addClass('moving');
 								
@@ -257,17 +263,23 @@
 									
 									(is.current > 1) ?
 										is.engine.stop().css('margin-left', '-' + ((distancePoint + is.wrapper.width()) - distance) + 'px') :
-										is.engine.stop().css('margin-left', '-' + ((distancePoint - distance) + is.wrapper.width()) + 'px');
+											is.engine.stop().css('margin-left', '-' + ((distancePoint - distance) + is.wrapper.width()) + 'px');
 									
 									if (distance >= settings.swipeLimit && phase == 'end') {
 										
 										(is.current > 1) ?
 											is.engineAnimate( '+=' + (is.wrapper.width() - distance), --is.current ) :
-											is.engineAnimate( 0, is.current = is.count - 2, false, true );
+												is.engineAnimate( 0, is.current = is.count - 2, false, true );
 										
 									} else if (distance <= settings.swipeLimit && phase == 'end') {
 										
 										is.engineAnimate('-' + (is.wrapper.width() * is.current), is.current);
+										
+									} else if ( phase == 'cancel') {
+										
+										(is.current > 1) ?
+											is.engineAnimate( '+=' + (is.wrapper.width() - distance), --is.current ) :
+												is.engineAnimate( 0, is.current = is.count - 2, false, true );
 										
 									}
 									
