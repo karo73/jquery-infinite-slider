@@ -233,7 +233,7 @@
 									
 									is.engine.stop().css('margin-left', '-' + (distancePoint + distance) + 'px');
 									
-									if (distance >= settings.swipeLimit && phase == 'end') {
+									if ((distance >= settings.swipeLimit && phase == 'end') || phase == 'cancel') {
 										
 										(is.current < is.count - 2) ?
 											is.engineAnimate('-' + ((is.wrapper.width() * is.current) + is.wrapper.width()), ++is.current) :
@@ -242,12 +242,6 @@
 									} else if (distance <= settings.swipeLimit && phase == 'end') {
 										
 										is.engineAnimate( '-' + (is.wrapper.width() * is.current), is.current );
-										
-									} else if (phase == 'cancel') {
-										
-										(is.current < is.count - 2) ?
-											is.engineAnimate('-' + ((is.wrapper.width() * is.current) + is.wrapper.width()), ++is.current) :
-												is.engineAnimate( ((is.wrapper.width() * is.current) + is.wrapper.width()), is.current = 1, true );
 										
 									}
 									
@@ -265,7 +259,7 @@
 										is.engine.stop().css('margin-left', '-' + ((distancePoint + is.wrapper.width()) - distance) + 'px') :
 											is.engine.stop().css('margin-left', '-' + ((distancePoint - distance) + is.wrapper.width()) + 'px');
 									
-									if (distance >= settings.swipeLimit && phase == 'end') {
+									if ((distance >= settings.swipeLimit && phase == 'end') || phase == 'cancel') {
 										
 										(is.current > 1) ?
 											is.engineAnimate( '+=' + (is.wrapper.width() - distance), --is.current ) :
@@ -274,12 +268,6 @@
 									} else if (distance <= settings.swipeLimit && phase == 'end') {
 										
 										is.engineAnimate('-' + (is.wrapper.width() * is.current), is.current);
-										
-									} else if ( phase == 'cancel') {
-										
-										(is.current > 1) ?
-											is.engineAnimate( '+=' + (is.wrapper.width() - distance), --is.current ) :
-												is.engineAnimate( 0, is.current = is.count - 2, false, true );
 										
 									}
 									
